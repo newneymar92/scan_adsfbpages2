@@ -1,0 +1,12 @@
+/* styles.css */
+.selected-row {
+    background-color: yellow; /* Màu nền cho hàng đã chọn */
+  }
+  
+  /* Màu mặc định cho các hàng */
+  .ant-table-tbody > tr:hover > td,
+  .ant-table-tbody > tr:hover > td > div {
+    background-color: transparent !important; /* Xóa màu nền */
+    color: inherit !important; /* Giữ nguyên màu chữ */
+  }
+  
