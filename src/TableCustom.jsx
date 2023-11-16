@@ -89,7 +89,7 @@ const TableCustom = () => {
             ad_type: "ALL",
             search_type: "KEYWORD_EXACT_PHRASE",
             ad_reached_countries: [`${value?.ad_reached_countries}`],
-            limit: 20,
+            limit: 100,
             ad_active_status: "ACTIVE",
           },
         }
