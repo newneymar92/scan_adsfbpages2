@@ -3,6 +3,7 @@ import { Button, Form, Input, Row, Select, Spin, Table, message } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { saveAs } from 'file-saver';
 
 const TableCustom = () => {
   const [nextLink, setNextLink] = useState("");
@@ -81,7 +82,7 @@ const TableCustom = () => {
         {
           params: {
             access_token:
-              "EAAOYsQgkMfEBOZCZCLHAhgiC5CIaKuYoOfG8xqmFWPBvJq1AoGGy2sDz2ZBvP2871MKtOXjE6IWzUhsZCNEorNnfVbqcefxodcsqXZCWar1DZCu005UnjkV469yRfdmMTE5uFdknfuZCezWpuPi5fe096NXWM4G1lLWmSSM3Ub14SNSZCANzxFLG8UgTq113EtZBwoGlGZB8tE",
+              "EAAOYsQgkMfEBO9QCyPusl4DDEwi1XTIT2wIU7BDgUYZBRf3W5dTjBj0hMF05k6eqnwfUqAXRZBZCRDiGZClKw8bqww0eZCZCluzTd6qVTjKZCASTNBZBZCeXeT6cy0BG1s5PpZC1ONwUEf6FTi2e9eaiYc3pdKABsKF9ltFZC6WYSItZAwWn0tZCFFXZAj4pVLkABh2ShWxeTwrkFp",
             search_terms: value?.search_terms,
             ad_type: "ALL",
             search_type: "KEYWORD_EXACT_PHRASE",
@@ -163,18 +164,18 @@ const TableCustom = () => {
   ];
 
   const handlePause = async () => {
-    try {
-      const res = await axios.get("https://baocon.click/page");
-      const listPagesClicked = res.data.data.map((item) => item.pageUrl);
-      const result = handleFilterDataSource(tempData, listPagesClicked);
-      setDataSource(result);
-      setIsAutoScan(!isAutoScan);
-    } catch (error) {
       const result = handleFilterDataSource(tempData, []);
       setDataSource(result);
       setIsAutoScan(!isAutoScan);
-    }
   };
+
+  const handleDownload = ()=>{
+    const arrayOfStrings = dataSource.map((obj) => JSON.stringify(Number(obj.page_id)));
+    const resultString = arrayOfStrings.join('\n');
+    const content = resultString; 
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    saveAs(blob, "filename.txt");
+  }
 
   const handleAutoScan = async (nextLink) => {
     const res = await axios.get(nextLink);
@@ -246,6 +247,7 @@ const TableCustom = () => {
               onChange={handleChangeRangePick}
             />
             <Button onClick={resetTabs}>Đặt lại </Button>
+            <Button onClick={handleDownload}>Tải xuống </Button>
           </Row>
         </Form>
         <div style={{display:"flex"}}>
