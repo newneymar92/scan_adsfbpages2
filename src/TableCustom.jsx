@@ -1,11 +1,13 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Row, Select, Spin, Table, message } from "antd";
 import axios from "axios";
+import dayjs from "dayjs";
+import { saveAs } from 'file-saver';
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { saveAs } from 'file-saver';
 
 const TableCustom = () => {
+  const [form] = Form.useForm();
   const [nextLink, setNextLink] = useState("");
   const [tempData, setTempData] = useState([]);
   const [isAutoScan, setIsAutoScan] = useState(true);
@@ -174,7 +176,7 @@ const TableCustom = () => {
     const resultString = arrayOfStrings.join('\n');
     const content = resultString; 
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, "filename.txt");
+    saveAs(blob, `${form.getFieldValue("search_terms")}_${form.getFieldValue("ad_reached_countries")}_${dayjs().format("DD-MM-YYYY HH:mm")}.txt`);
   }
 
   const handleAutoScan = async (nextLink) => {
@@ -210,6 +212,7 @@ const TableCustom = () => {
           initialValues={{}}
           onFinish={handleSearch}
           style={{ margin: "20px", maxWidth: 1000 }}
+          form={form}
         >
           {/* <Form.Item name="access_token" label="Access Token">
             <Input />
