@@ -175,8 +175,8 @@ const TableCustom = () => {
     const arrayOfStrings = dataSource.map((obj) => JSON.stringify(Number(obj.page_id)));
     const resultString = arrayOfStrings.join('\n');
     const content = resultString; 
-    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, `${form.getFieldValue("search_terms")}_${form.getFieldValue("ad_reached_countries")}_${dayjs().format("DD-MM-YYYY HH:mm")}.txt`);
+    const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
+    saveAs(blob, `${form.getFieldValue("search_terms")}_${form.getFieldValue("ad_reached_countries")}_${dayjs().format("DD-MM-YYYY HH:mm")}.json`);
   }
 
   const handleAutoScan = async (nextLink) => {
