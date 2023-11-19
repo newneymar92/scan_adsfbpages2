@@ -2,7 +2,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Row, Select, Spin, Table, message } from "antd";
 import axios from "axios";
 import dayjs from "dayjs";
-import { saveAs } from 'file-saver';
+import { saveAs } from "file-saver";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -77,21 +77,29 @@ const TableCustom = () => {
   };
 
   const handleSearch = async (value) => {
+    const defaultParam = {
+      access_token:
+        "EAAOYsQgkMfEBO9QCyPusl4DDEwi1XTIT2wIU7BDgUYZBRf3W5dTjBj0hMF05k6eqnwfUqAXRZBZCRDiGZClKw8bqww0eZCZCluzTd6qVTjKZCASTNBZBZCeXeT6cy0BG1s5PpZC1ONwUEf6FTi2e9eaiYc3pdKABsKF9ltFZC6WYSItZAwWn0tZCFFXZAj4pVLkABh2ShWxeTwrkFp",
+      search_terms: value?.search_terms,
+      ad_type: "ALL",
+      search_type: "KEYWORD_EXACT_PHRASE",
+      ad_reached_countries: [`${value?.ad_reached_countries}`],
+      limit: 100,
+      ad_active_status: "ACTIVE",
+    };
+    let params = defaultParam;
+    if (value?.ad_reached_countries === "JP") {
+      params = { ...defaultParam, languages: ["ja"] };
+    }
+    if (value?.ad_reached_countries === "KR") {
+      params = { ...defaultParam, languages: ["ko"] };
+    }
     setLoading(true);
     try {
       const res = await axios.get(
         "https://graph.facebook.com/v18.0/ads_archive",
         {
-          params: {
-            access_token:
-              "EAAOYsQgkMfEBO9QCyPusl4DDEwi1XTIT2wIU7BDgUYZBRf3W5dTjBj0hMF05k6eqnwfUqAXRZBZCRDiGZClKw8bqww0eZCZCluzTd6qVTjKZCASTNBZBZCeXeT6cy0BG1s5PpZC1ONwUEf6FTi2e9eaiYc3pdKABsKF9ltFZC6WYSItZAwWn0tZCFFXZAj4pVLkABh2ShWxeTwrkFp",
-            search_terms: value?.search_terms,
-            ad_type: "ALL",
-            search_type: "KEYWORD_EXACT_PHRASE",
-            ad_reached_countries: [`${value?.ad_reached_countries}`],
-            limit: 100,
-            ad_active_status: "ACTIVE",
-          },
+          params,
         }
       );
       if (res.data) {
@@ -134,8 +142,8 @@ const TableCustom = () => {
       render: (page_id) => (
         <div>
           <Button
-          type="primary"
-          size="large"
+            type="primary"
+            size="large"
             onClick={() => {
               window.open(`https://mbasic.facebook.com/${page_id}`, "_blank");
             }}
@@ -152,8 +160,8 @@ const TableCustom = () => {
       render: (page_id) => (
         <div>
           <Button
-          type="primary"
-          size="large"
+            type="primary"
+            size="large"
             onClick={() => {
               window.open(`https://www.facebook.com/${page_id}`, "_blank");
             }}
@@ -166,22 +174,31 @@ const TableCustom = () => {
   ];
 
   const handlePause = async () => {
-      const result = handleFilterDataSource(tempData, []);
-      setDataSource(result);
-      setIsAutoScan(!isAutoScan);
+    const result = handleFilterDataSource(tempData, []);
+    setDataSource(result);
+    setIsAutoScan(!isAutoScan);
   };
 
-  const handleDownload = ()=>{
-    const arrayOfStrings = dataSource.map((obj) => JSON.stringify(Number(obj.page_id)));
-    const resultString = arrayOfStrings.join('\n');
-    const content = resultString; 
-    const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
-    saveAs(blob, `${form.getFieldValue("search_terms")}_${form.getFieldValue("ad_reached_countries")}_${dayjs().format("DD-MM-YYYY HH:mm")}.json`);
-  }
+  const handleDownload = () => {
+    const arrayOfStrings = dataSource.map((obj) =>
+      JSON.stringify(Number(obj.page_id))
+    );
+    const resultString = arrayOfStrings.join("\n");
+    const content = resultString;
+    const blob = new Blob([content], {
+      type: "application/json;charset=utf-8",
+    });
+    saveAs(
+      blob,
+      `${form.getFieldValue("search_terms")}_${form.getFieldValue(
+        "ad_reached_countries"
+      )}_${dayjs().format("DD-MM-YYYY HH:mm")}.json`
+    );
+  };
 
   const handleAutoScan = async (nextLink) => {
     const res = await axios.get(nextLink);
-    if (res.data) {
+    if (res.data && res.data.data.length !== 0) {
       setNextLink(res.data.paging.next);
       setTempData((prev) => [...prev, ...res.data.data]);
     }
@@ -192,7 +209,6 @@ const TableCustom = () => {
       handleAutoScan(nextLink);
     }
   }, [isAutoScan, nextLink]);
-
 
   return (
     <Spin
@@ -253,18 +269,19 @@ const TableCustom = () => {
             <Button onClick={handleDownload}>Tải xuống </Button>
           </Row>
         </Form>
-        <div style={{display:"flex"}}>
-        <div style={{ margin: "20px", fontSize: "24px" }}>
-          Số thứ tự trang hiện tại (khi chọn mở liên tiếp): {currentIndex && currentIndex - 1}
+        <div style={{ display: "flex" }}>
+          <div style={{ margin: "20px", fontSize: "24px" }}>
+            Số thứ tự trang hiện tại (khi chọn mở liên tiếp):{" "}
+            {currentIndex && currentIndex - 1}
+          </div>
+          <div style={{ margin: "20px", fontSize: "24px" }}>
+            Tổng số trang đã quét: {tempData.length}
+          </div>
+          <div style={{ margin: "20px", fontSize: "24px" }}>
+            Tổng số trang đã lọc: {dataSource.length}
+          </div>
         </div>
-        <div style={{ margin: "20px", fontSize: "24px" }}>
-          Tổng số trang đã quét: {tempData.length}
-        </div>
-         <div style={{ margin: "20px", fontSize: "24px" }}>
-          Tổng số trang đã lọc: {dataSource.length}
-        </div>
-        </div>
-        
+
         <Table
           scroll={{ y: 500 }}
           pagination={false}
